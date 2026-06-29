@@ -1,0 +1,93 @@
+/* ============================================================
+   SENTINEL VISION - CUSTOM STYLES
+   Created by: Tahir Mahmood | © 2026
+   ============================================================ */
+
+/* Main Container */
+.stApp {
+    background: #0a0a1a;
+}
+
+/* Cyberpunk Theme */
+.css-1d391kg {
+    background: #0a0a1a !important;
+    border-right: 1px solid #00ff88 !important;
+}
+
+/* Headers */
+h1, h2, h3, h4 {
+    color: #00ff88 !important;
+}
+
+/* Cards */
+.stMetric {
+    background: #1a1a2e !important;
+    border: 1px solid #00ff88 !important;
+    border-radius: 12px !important;
+    padding: 15px !important;
+}
+
+/* Buttons */
+.stButton button {
+    background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%) !important;
+    color: #0a0a1a !important;
+    font-weight: 600 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 10px 24px !important;
+    transition: all 0.3s ease !important;
+}
+
+.stButton button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 0 30px rgba(0,255,136,0.3) !important;
+}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px !important;
+}
+
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px !important;
+    padding: 8px 16px !important;
+    font-weight: 500 !important;
+    color: #888 !important;
+}
+
+.stTabs [data-baseweb="tab"][aria-selected="true"] {
+    background: #00ff88 !important;
+    color: #0a0a1a !important;
+}
+
+/* Dataframes */
+.dataframe {
+    background: #1a1a2e !important;
+    border: 1px solid #333 !important;
+    border-radius: 8px !important;
+}
+
+.dataframe thead tr th {
+    background: #00ff88 !important;
+    color: #0a0a1a !important;
+}
+
+/* Toggle Switch */
+.stToggle {
+    background: #1a1a2e !important;
+}
+
+/* Sidebar */
+.css-1d391kg .stMarkdown {
+    color: #aaa !important;
+}
+
+/* Info Boxes */
+.stAlert {
+    border-radius: 8px !important;
+}
+
+/* Progress Bars */
+.stProgress > div {
+    background: linear-gradient(90deg, #00ff88, #00cc66) !important;
+}

@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# Streamlit
+.streamlit/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data files
+*.csv
+*.xlsx
+*.xls
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+*.secret
+*.key
+*.pem
+.env
+config.json
+secrets.json
