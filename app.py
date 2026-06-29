@@ -3,6 +3,19 @@ Sentinel Vision Pro - Advanced AI Privacy & Security Shield
 Created by: Tahir Mahmood
 Year: 2026
 """
+import os
+import sys
+import subprocess
+
+# Ensure only headless OpenCV is used
+try:
+    import cv2
+    print(f"✅ OpenCV version: {cv2.__version__}")
+except ImportError:
+    print("📦 Installing opencv-python-headless...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "opencv-python-headless==4.8.1.78"])
+    import cv2
+    print(f"✅ OpenCV installed successfully!")
 
 import streamlit as st
 import cv2
