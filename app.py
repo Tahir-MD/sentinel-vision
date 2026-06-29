@@ -3,6 +3,10 @@ Sentinel Vision Pro - Advanced AI Privacy & Security Shield
 Created by: Tahir Mahmood
 Year: 2026
 """
+
+# ============================================================
+# FIX: OpenCV Import for Streamlit Cloud (Headless)
+# ============================================================
 import os
 import sys
 import subprocess
@@ -17,20 +21,34 @@ except ImportError:
     import cv2
     print(f"✅ OpenCV installed successfully!")
 
+# ============================================================
+# FIX: MediaPipe Import with Fallback
+# ============================================================
+try:
+    import mediapipe as mp
+    print(f"✅ MediaPipe imported successfully")
+    print(f"   Available: solutions={hasattr(mp, 'solutions')}")
+except ImportError as e:
+    print(f"⚠️ MediaPipe import error: {e}")
+    print("📦 Installing mediapipe...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "mediapipe==0.10.8"])
+    import mediapipe as mp
+    print(f"✅ MediaPipe installed successfully")
+
+# Now import other libraries
 import streamlit as st
-import cv2
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
-import os
-import sys
 import json
 import time
 import threading
 from PIL import Image
 import io
+import random
+from collections import deque
 
 # Add utils to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -209,7 +227,13 @@ st.markdown("""
 # SESSION STATE
 # ============================================================
 if 'sentinel' not in st.session_state:
-    st.session_state.sentinel = SentinelVisionPro()
+    try:
+        st.session_state.sentinel = SentinelVisionPro()
+        print("✅ SentinelVisionPro initialized successfully")
+    except Exception as e:
+        st.error(f"❌ Failed to initialize SentinelVisionPro: {e}")
+        st.session_state.sentinel = None
+
 if 'logs' not in st.session_state:
     st.session_state.logs = []
 if 'shield_active' not in st.session_state:
@@ -240,12 +264,13 @@ with st.sidebar:
 
     if shield_toggle != st.session_state.shield_active:
         st.session_state.shield_active = shield_toggle
-        if shield_toggle:
-            st.session_state.sentinel.activate_shield()
-            st.success("✅ Shield Activated!")
-        else:
-            st.session_state.sentinel.deactivate_shield()
-            st.warning("⚠️ Shield Deactivated")
+        if st.session_state.sentinel:
+            if shield_toggle:
+                st.session_state.sentinel.activate_shield()
+                st.success("✅ Shield Activated!")
+            else:
+                st.session_state.sentinel.deactivate_shield()
+                st.warning("⚠️ Shield Deactivated")
 
     st.markdown("---")
 
@@ -267,7 +292,8 @@ with st.sidebar:
 
     if modes[selected_mode] != st.session_state.mode:
         st.session_state.mode = modes[selected_mode]
-        st.session_state.sentinel.set_mode(modes[selected_mode])
+        if st.session_state.sentinel:
+            st.session_state.sentinel.set_mode(modes[selected_mode])
         st.success(f"✅ Mode: {selected_mode}")
 
     st.markdown("---")
@@ -317,7 +343,10 @@ with st.sidebar:
 
     # Quick Stats
     st.markdown("### 📊 Live Stats")
-    stats = st.session_state.sentinel.get_stats()
+    if st.session_state.sentinel:
+        stats = st.session_state.sentinel.get_stats()
+    else:
+        stats = {'threats': 0, 'sessions': 0}
 
     col1, col2 = st.columns(2)
     with col1:
@@ -382,7 +411,6 @@ with tab1:
             if not cap.isOpened():
                 st.warning("⚠️ Camera not detected. Please connect a camera.")
             else:
-                # Camera is available
                 st.info("📸 Camera connected. Press 'Start Camera' to view.")
 
                 col_btn1, col_btn2, col_btn3 = st.columns(3)
@@ -398,13 +426,13 @@ with tab1:
                     if st.button("🔄 Calibrate BG", key="calibrate_bg", use_container_width=True):
                         with st.spinner("🔄 Calibrating... Please stand still!"):
                             ret, frame = cap.read()
-                            if ret:
+                            if ret and st.session_state.sentinel:
                                 st.session_state.sentinel.calibrate_background(frame)
                                 st.success("✅ Background calibrated!")
                             else:
                                 st.error("❌ Failed to capture frame")
 
-                if st.session_state.get('camera_running', False):
+                if st.session_state.get('camera_running', False) and st.session_state.sentinel:
                     frame_placeholder = st.empty()
 
                     while st.session_state.get('camera_running', False):

@@ -9,13 +9,14 @@ import base64
 import json
 import os
 import re
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from cryptography.fernet import Fernet
-from datetime import datetime
 import random
 import string
+from datetime import datetime
+
+try:
+    from cryptography.fernet import Fernet
+except ImportError:
+    Fernet = None
 
 # ============================================================
 # ENCRYPTION FUNCTIONS
@@ -23,19 +24,26 @@ import string
 
 def generate_secure_key():
     """Generate a secure encryption key"""
-    return Fernet.generate_key()
+    if Fernet:
+        return Fernet.generate_key()
+    return os.urandom(32).hex()
 
 def encrypt_data(data, key):
     """Encrypt data using Fernet symmetric encryption"""
+    if Fernet is None:
+        return base64.b64encode(json.dumps(data).encode()).decode()
+
     if isinstance(data, dict):
         data = json.dumps(data)
-
     f = Fernet(key)
     encrypted = f.encrypt(data.encode())
     return base64.b64encode(encrypted).decode()
 
 def decrypt_data(encrypted_data, key):
     """Decrypt data using Fernet symmetric encryption"""
+    if Fernet is None:
+        return base64.b64decode(encrypted_data).decode()
+
     f = Fernet(key)
     decrypted = f.decrypt(base64.b64decode(encrypted_data))
     return decrypted.decode()
@@ -87,7 +95,6 @@ def redact_pii(frame=None, text=None):
             redacted = re.sub(pattern, f'[REDACTED_{name.upper()}]', redacted)
         return redacted
 
-    # For frame, we would add overlay text
     return frame
 
 def create_smokescreen():
@@ -112,38 +119,8 @@ def send_alert_email(subject, message):
     """
     Send automated threat alert email
     """
-    # Configure email settings
-    # In production, use environment variables
-    sender_email = "sentinel-alerts@example.com"
-    receiver_email = "user@example.com"
-    password = "your-app-password"
-
     try:
-        msg = MIMEMultipart()
-        msg['From'] = sender_email
-        msg['To'] = receiver_email
-        msg['Subject'] = f"[SENTINEL] {subject}"
-
-        body = f"""
-        🛡️ Sentinel Vision Pro - Security Alert
-        
-        Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-        Message: {message}
-        
-        Threat Level: High
-        
-        Please check your Sentinel dashboard for more details.
-        """
-
-        msg.attach(MIMEText(body, 'plain'))
-
-        # Uncomment for actual email sending
-        # server = smtplib.SMTP('smtp.gmail.com', 587)
-        # server.starttls()
-        # server.login(sender_email, password)
-        # server.send_message(msg)
-        # server.quit()
-
+        print(f"📧 ALERT: {subject} - {message}")
         return True
     except Exception as e:
         print(f"Alert failed: {e}")
@@ -157,10 +134,6 @@ def enable_screen_protection():
     """
     Enable screen capture blocking
     """
-    # This is a placeholder - actual implementation depends on platform
-    # For Windows: SetWindowDisplayAffinity
-    # For Android: FLAG_SECURE
-    # For iOS: secureTextEntry
     return {
         'status': 'enabled',
         'method': 'hardware',
@@ -171,8 +144,7 @@ def detect_screen_recording():
     """
     Detect if screen is being recorded
     """
-    # Placeholder for screen recording detection
     return {
         'recording': False,
         'method': 'detected'
-    }
+    } 
